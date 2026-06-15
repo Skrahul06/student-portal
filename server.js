@@ -68,6 +68,35 @@ app.get('/api/signatures/count', async (req, res) => {
   }
 });
 
+// --- ADMIN API ROUTE ---
+app.get('/api/signatures', async (req, res) => {
+    try {
+        // 1. Safety Check: Ensure the environment variable actually exists
+        if (!process.env.ADMIN_PASSWORD) {
+            console.error("CRITICAL: ADMIN_PASSWORD is not set in environment variables!");
+            return res.status(500).json({ error: "Server configuration error" });
+        }
+
+        // 2. Authentication Check
+        if (req.query.password !== process.env.ADMIN_PASSWORD) {
+            return res.status(401).json({ error: "Unauthorized: Invalid Password" });
+        }
+
+        // 3. Fetch and Optimize Data
+        // Using 'signatures' as you specified
+        const data = await signatures.find()
+            .sort({ _id: -1 })
+            .select('name rollNo department semester createdAt -_id');
+
+        // 4. Send the data back
+        res.status(200).json(data);
+
+    } catch (error) {
+        console.error("Error fetching signatures:", error);
+        res.status(500).json({ error: "Failed to fetch data" });
+    }
+});
+
 // 5. Start the Server
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {
