@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Student Grievance & Petition Portal</title>
+    
+    <script>
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    <script>
+        tailwind.config = { darkMode: "class", theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] } } } }
+    </script>
+    <style>
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        body { transition: background-color 0.3s ease, color 0.3s ease; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .dark ::-webkit-scrollbar-thumb { background: #475569; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        /* Autofill Fix */
+        input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:focus, input:-webkit-autofill:active {
+            -webkit-box-shadow: 0 0 0 30px #121214 inset !important;
+            -webkit-text-fill-color: white !important;
+            transition: background-color 5000s ease-in-out 0s;
+        }
+        html:not(.dark) input:-webkit-autofill {
+            -webkit-box-shadow: 0 0 0 30px transparent inset !important;
+            -webkit-text-fill-color: #111827 !important;
+        }
+
+        /* Global Loader */
+        .loader {
+            width: 60px; aspect-ratio: 2;
+            --_g: no-repeat radial-gradient(circle closest-side, currentColor 90%, transparent);
+            background: var(--_g) 0% 50%, var(--_g) 50% 50%, var(--_g) 100% 50%;
+            background-size: calc(100%/3) 50%;
+            animation: l3 1s infinite linear;
+        }
+        @keyframes l3 {
+            20% {background-position: 0% 0%, 50% 50%, 100% 50%}
+            40% {background-position: 0% 100%, 50% 0%, 100% 50%}
+            60% {background-position: 0% 50%, 50% 100%, 100% 0%}
+            80% {background-position: 0% 50%, 50% 50%, 100% 100%}
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900 dark:bg-[#121214] dark:text-gray-100 min-h-screen font-sans antialiased">
+
+<div id="loader-overlay" class="fixed inset-0 z-[999] bg-white dark:bg-[#121214] flex justify-center items-center transition-opacity duration-500 text-black dark:text-white">
+    <div class="loader"></div>
+</div>
+
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-4 md:px-8 h-16 bg-white dark:bg-[#1a1a1e] border-b border-gray-200 dark:border-gray-800 shadow-sm">
+    <div class="flex items-center gap-3">
+        <span class="material-symbols-outlined text-black dark:text-white">gavel</span>
+        <h1 class="font-bold text-lg tracking-tight">Student Grievance Portal</h1>
+    </div>
+    <button class="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" onclick="toggleTheme()">
+        <span class="material-symbols-outlined text-gray-600 dark:text-gray-300">dark_mode</span>
+    </button>
+</header>
+
+<main class="pt-24 pb-24 max-w-3xl mx-auto px-4 sm:px-6 flex flex-col items-center">
+    <div class="w-full mb-8">
+        <div class="bg-white dark:bg-[#1a1a1e] border border-gray-100 dark:border-gray-800 p-6 flex flex-col md:flex-row items-center justify-between gap-6 rounded-xl shadow-lg">
+            <div>
+                <span class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-widest">Public Record</span>
+                <h2 class="text-2xl font-bold mt-1">Formal Petition Status</h2>
+            </div>
+            <div class="bg-gray-50 dark:bg-[#26262b] px-6 py-3 rounded-full flex items-center gap-4 border border-gray-200 dark:border-gray-700 shadow-inner">
+                <span class="text-sm font-medium text-gray-600 dark:text-gray-300">Verified Signatures</span>
+                <span class="text-3xl font-bold tabular-nums" id="signature-count">
+                    <span class="animate-pulse text-gray-400">...</span>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div class="w-full bg-white dark:bg-[#1a1a1e] border border-gray-100 dark:border-gray-800 p-6 md:p-10 rounded-xl shadow-xl">
+        <section class="mb-10">
+            <h3 class="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-4 uppercase tracking-widest">The Grievance</h3>
+            <div class="pl-5 border-l-4 border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 italic text-sm md:text-base leading-relaxed max-h-40 overflow-y-auto pr-2">
+                "Forcing upfront 5th-semester fee clearing ahead of university registration cycles, alongside rigid 75% attendance bans without medical/personal consideration, places undue strain on students and departs from standard MAKAUT regulatory frameworks. 
+                <br><br>
+                We, the undersigned, formally request an immediate review of these mandates, a grace period for fee submissions, and a structural re-evaluation of the attendance policy."
+            </div>
+        </section>
+        
+        <hr class="border-t border-gray-200 dark:border-gray-800 mb-8"/>
+
+        <form class="space-y-6" id="petition-form">
+            <div>
+                <label class="block text-sm font-medium mb-2" for="full_name">Full Name (Official)</label>
+                <input class="w-full bg-transparent border border-gray-300 dark:border-gray-700 rounded-lg p-3.5 focus:outline-none focus:border-black dark:focus:border-white transition-all" id="full_name" placeholder="Johnathan Doe" required type="text"/>
+                <p id="name-feedback" class="text-xs mt-2 font-medium h-4 text-green-600 dark:text-green-400 hidden flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[14px]">edit</span> Auto-formatted to proper casing.
+                </p>
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium mb-2" for="roll_number">MAKAUT Roll Number</label>
+                <input class="w-full bg-transparent border border-gray-300 dark:border-gray-700 rounded-lg p-3.5 focus:outline-none focus:border-black dark:focus:border-white transition-all" id="roll_number" placeholder="12300121000" maxlength="11" required type="text"/>
+                <p id="roll-feedback" class="text-xs mt-2 font-medium h-4 text-gray-500 dark:text-gray-400 flex items-center gap-1 transition-colors duration-300">
+                    <span class="material-symbols-outlined text-[14px]">info</span> Enter your 11-digit university roll.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
+                <div class="relative custom-dropdown" data-target="department_input">
+                    <label class="block text-sm font-medium mb-2">Department</label>
+                    <button type="button" class="dropdown-btn w-full bg-transparent border border-gray-300 dark:border-gray-700 rounded-lg p-3.5 text-left flex justify-between items-center focus:border-black dark:focus:border-white">
+                        <span class="dropdown-text text-gray-400">Select Department</span>
+                        <span class="material-symbols-outlined text-gray-400">expand_more</span>
+                    </button>
+                    <ul class="dropdown-menu absolute hidden w-full mt-2 bg-white dark:bg-black border border-gray-200 dark:border-gray-800 rounded-lg shadow-xl max-h-48 overflow-y-auto z-20">
+                        <li class="p-3 text-sm cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 dark:text-white" data-value="Data Science">Data Science</li>
+                        <li class="p-3 text-sm cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 dark:text-white" data-value="Cyber Security">Cyber Security</li>
+                        <li class="p-3 text-sm cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 dark:text-white" data-value="BCA">BCA</li>
+                        <li class="p-3 text-sm cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 dark:text-white" data-value="Other">Other</li>
+                    </ul>
+                    <input type="hidden" id="department_input" required>
+                </div>
+
+                <div class="relative custom-dropdown" data-target="semester_input">
+                    <label class="block text-sm font-medium mb-2">Current Semester</label>
+                    <button type="button" class="dropdown-btn w-full bg-transparent border border-gray-300 dark:border-gray-700 rounded-lg p-3.5 text-left flex justify-between items-center focus:border-black dark:focus:border-white">
+                        <span class="dropdown-text text-gray-400">Select Semester</span>
+                        <span class="material-symbols-outlined text-gray-400">expand_more</span>
+                    </button>
+                    <ul class="dropdown-menu absolute hidden w-full mt-2 bg-white dark:bg-black border border-gray-200 dark:border-gray-800 rounded-lg shadow-xl max-h-48 overflow-y-auto z-20">
+                        <li class="p-3 text-sm cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 dark:text-white" data-value="1">1st Semester</li>
+                        <li class="p-3 text-sm cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 dark:text-white" data-value="2">2nd Semester</li>
+                        <li class="p-3 text-sm cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 dark:text-white" data-value="3">3rd Semester</li>
+                        <li class="p-3 text-sm cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 dark:text-white" data-value="4">4th Semester</li>
+                        <li class="p-3 text-sm cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 dark:text-white" data-value="5">5th Semester</li>
+                        <li class="p-3 text-sm cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 dark:text-white" data-value="6">6th Semester</li>
+                        <li class="p-3 text-sm cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 dark:text-white" data-value="7">7th Semester</li>
+                        <li class="p-3 text-sm cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 dark:text-white" data-value="8">8th Semester</li>
+                    </ul>
+                    <input type="hidden" id="semester_input" required>
+                </div>
+            </div>
+            
+            <div class="pt-6">
+                <button class="w-full h-14 rounded-lg bg-black text-white dark:bg-white dark:text-black font-semibold text-sm uppercase tracking-widest hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-3" id="submit-btn" type="submit" disabled>
+                    <span>Verify & Sign Petition</span>
+                    <span class="material-symbols-outlined text-lg">history_edu</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</main>
+
+<script>
+    // --- Theme Toggle Logic ---
+    function toggleTheme() {
+        const html = document.documentElement;
+        html.classList.toggle('dark');
+        localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+    }
+
+    // --- Fetch Live Database Count ---
+    async function fetchCount() {
+        try {
+            const res = await fetch('/api/signatures/count');
+            const data = await res.json();
+            document.getElementById('signature-count').innerText = data.count;
+        } catch (err) {
+            console.error("Count error:", err);
+            document.getElementById('signature-count').innerText = "?";
+        }
+    }
+
+    // --- Loader ---
+    window.addEventListener('load', () => {
+        fetchCount(); // Fetch the count as soon as the page loads
+        setTimeout(() => {
+            const loader = document.getElementById('loader-overlay');
+            loader.style.opacity = '0';
+            setTimeout(() => loader.remove(), 500);
+        }, 500);
+    });
+
+    const nameInput = document.getElementById('full_name');
+    const rollInput = document.getElementById('roll_number');
+    const deptInput = document.getElementById('department_input');
+    const semInput = document.getElementById('semester_input');
+    const submitBtn = document.getElementById('submit-btn');
+    const rollFeedback = document.getElementById('roll-feedback');
+    const nameFeedback = document.getElementById('name-feedback');
+
+    // Centralized Validation Checker
+    function checkFormValidity(isDuplicate = false) {
+        if (
+            rollInput.value.length === 11 && 
+            !isDuplicate &&
+            nameInput.value.trim() !== '' &&
+            deptInput.value !== '' &&
+            semInput.value !== ''
+        ) {
+            submitBtn.disabled = false;
+        } else {
+            submitBtn.disabled = true;
+        }
+    }
+
+    // Name Listener
+    function formatName(e) {
+        let original = e.target.value;
+        let formatted = original.replace(/\b\w/g, char => char.toUpperCase());
+        if (original !== formatted) {
+            e.target.value = formatted;
+            nameFeedback.classList.remove('hidden');
+            setTimeout(() => nameFeedback.classList.add('hidden'), 3000);
+        }
+        checkFormValidity();
+    }
+    nameInput.addEventListener('input', formatName);
+    nameInput.addEventListener('change', formatName);
+
+    // Roll Number Listener (WITH DUPLICATE CHECK)
+    function validateRoll(e) {
+        e.target.value = e.target.value.replace(/\D/g, ''); 
+        let val = e.target.value;
+        
+        // Fetch "Database" from LocalStorage
+        const signedRolls = JSON.parse(localStorage.getItem('signedRolls') || '[]');
+        let isDuplicate = signedRolls.includes(val);
+
+        if (val.length === 11) {
+            if (isDuplicate) {
+                rollFeedback.innerHTML = '<span class="material-symbols-outlined text-[14px]">warning</span> You have already contributed, no need for extra effort!';
+                rollFeedback.className = "text-xs mt-2 font-medium h-4 text-orange-500 flex items-center gap-1 transition-colors duration-300";
+            } else {
+                rollFeedback.innerHTML = '<span class="material-symbols-outlined text-[14px]">check_circle</span> Verified exact format.';
+                rollFeedback.className = "text-xs mt-2 font-medium h-4 text-green-600 dark:text-green-400 flex items-center gap-1 transition-colors duration-300";
+            }
+        } else if (val.length > 0) {
+            rollFeedback.innerHTML = `<span class="material-symbols-outlined text-[14px]">error</span> Must be exactly 11 numbers. (${val.length}/11)`;
+            rollFeedback.className = "text-xs mt-2 font-medium h-4 text-red-500 flex items-center gap-1 transition-colors duration-300";
+        } else {
+            rollFeedback.innerHTML = '<span class="material-symbols-outlined text-[14px]">info</span> Enter your 11-digit university roll.';
+            rollFeedback.className = "text-xs mt-2 font-medium h-4 text-gray-500 dark:text-gray-400 flex items-center gap-1 transition-colors duration-300";
+        }
+        
+        checkFormValidity(isDuplicate);
+    }
+    rollInput.addEventListener('input', validateRoll);
+    rollInput.addEventListener('change', validateRoll);
+
+    // Dropdown Logic
+    document.querySelectorAll('.custom-dropdown').forEach(dropdown => {
+        const btn = dropdown.querySelector('.dropdown-btn');
+        const text = dropdown.querySelector('.dropdown-text');
+        const menu = dropdown.querySelector('.dropdown-menu');
+        const hiddenInput = document.getElementById(dropdown.dataset.target);
+        const options = dropdown.querySelectorAll('li');
+
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.dropdown-menu').forEach(m => { if (m !== menu) m.classList.add('hidden'); });
+            menu.classList.toggle('hidden');
+        });
+
+        options.forEach(option => {
+            option.addEventListener('click', () => {
+                text.innerText = option.innerText;
+                text.classList.remove('text-gray-400');
+                text.classList.add('text-black', 'dark:text-white');
+                hiddenInput.value = option.dataset.value;
+                menu.classList.add('hidden');
+                validateRoll({target: rollInput}); // Re-trigger validation check
+            });
+        });
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.custom-dropdown')) {
+            document.querySelectorAll('.dropdown-menu').forEach(menu => menu.classList.add('hidden'));
+        }
+    });
+
+    // --- LIVE DATABASE SUBMISSION LOGIC ---
+    document.getElementById('petition-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        if(submitBtn.disabled) return;
+
+        submitBtn.innerHTML = '<div class="loader" style="width: 30px; height: 15px;"></div> <span>Processing...</span>';
+        submitBtn.disabled = true;
+
+        // Package the real data
+        const payload = {
+            fullName: nameInput.value,
+            rollNumber: rollInput.value,
+            department: deptInput.value,
+            semester: semInput.value
+        };
+
+        try {
+            // Send it to the Node.js backend
+            const res = await fetch('/api/signatures/sign', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            
+            if (res.ok) {
+                // Save to LocalStorage to prevent spamming from this browser
+                const signedRolls = JSON.parse(localStorage.getItem('signedRolls') || '[]');
+                signedRolls.push(rollInput.value);
+                localStorage.setItem('signedRolls', JSON.stringify(signedRolls));
+
+                // Redirect to success page
+                window.location.href = 'success.html';
+            } else {
+                const data = await res.json();
+                
+                // If it's a database duplicate error
+                if (data.error.includes("already signed")) {
+                    rollFeedback.innerHTML = '<span class="material-symbols-outlined text-[14px]">warning</span> You have already contributed, no need for extra effort!';
+                    rollFeedback.className = "text-xs mt-2 font-medium h-4 text-orange-500 flex items-center gap-1 transition-colors duration-300";
+                    
+                    // Add it to local storage so the frontend remembers next time
+                    const signedRolls = JSON.parse(localStorage.getItem('signedRolls') || '[]');
+                    if (!signedRolls.includes(rollInput.value)) {
+                        signedRolls.push(rollInput.value);
+                        localStorage.setItem('signedRolls', JSON.stringify(signedRolls));
+                    }
+                } else {
+                    alert("Database Error: " + data.error);
+                }
+                resetSubmitButton();
+            }
+        } catch (err) {
+            alert("Connection failed. Is node server.js running?");
+            resetSubmitButton();
+        }
+    });
+
+    function resetSubmitButton() {
+        submitBtn.innerHTML = '<span>Verify & Sign Petition</span><span class="material-symbols-outlined text-lg">history_edu</span>';
+        submitBtn.disabled = false;
+    }
+</script>
+</body>
+</html>
