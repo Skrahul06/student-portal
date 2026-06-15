@@ -95,14 +95,18 @@
     window.addEventListener('load', () => {
         setTimeout(() => {
             const loader = document.getElementById('loader-overlay');
-            loader.style.opacity = '0';
-            setTimeout(() => loader.remove(), 500);
+            if (loader) {
+                loader.style.opacity = '0';
+                setTimeout(() => loader.remove(), 500);
+            }
         }, 500);
     });
 
     function copyLink() {
         const btn = document.getElementById('copy-btn');
-        navigator.clipboard.writeText("https://your-portal-link.com"); 
+        // Updated with your live Render URL
+        const link = "https://student-portal-vi2l.onrender.com";
+        navigator.clipboard.writeText(link); 
         
         btn.innerHTML = '<span class="material-symbols-outlined text-green-500">check</span> <span class="text-green-500">Link Copied!</span>';
         btn.classList.add('border-green-500');
@@ -111,6 +115,17 @@
             btn.innerHTML = '<span class="material-symbols-outlined">content_copy</span> <span>Copy Petition Link</span>';
             btn.classList.remove('border-green-500');
         }, 3000);
+    }
+
+    function shareOnWhatsApp() {
+        const message = `We are gathering to finalize our strategy and present a verified mass petition officially to management on Wednesday, 17/06/26. A united front from every department is necessary to ensure our concerns are addressed.
+
+CRs, please forward this message to your respective groups immediately. Additionally, coordinate with the IT CRs to join the core planning group.
+
+For the record of our digital signatures, please fill out your details here: https://student-portal-vi2l.onrender.com`;
+        
+        const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
+        window.open(url, '_blank');
     }
 </script>
 </body>
